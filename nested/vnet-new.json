@@ -1,0 +1,129 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"nsgName": {
+			"type": "string",
+			"defaultValue": "nsg-default1"
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"defaultValue": "vnet",
+			"metadata": {
+				"description": "VNET name"
+			}
+		},
+		"virtualNetworkAddressPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "CIDR for vnet"
+			}
+		},
+		"mgmtSubnetName": {
+			"type": "string",
+			"defaultValue": "Mgmt",
+			"metadata": {
+				"description": "Subnet for Management"
+			}
+		},
+		"untrustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Untrust"
+			}
+		},
+		"trustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Trust"
+			}
+		},
+		"loadBalancerIP": {
+			"type": "string",
+			"metadata": {
+				"description": "Egress LoadBalancer IP"
+			}
+		},
+		"mgmtSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Mgmt subnet CIDR"
+			}
+		},
+		"untrustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Untrust subnet CIDR"
+			}
+		},
+		"trustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Trust subnet CIDR"
+			}
+		}	
+	},
+	"variables": {
+		"location": "[resourceGroup().location]",
+		"rgname": "[resourceGroup().id]",
+		"virtualNetworkName": "[parameters('virtualNetworkName')]",
+		"vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+		"mgmtSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('mgmtSubnetName'))]",
+		"untrustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('untrustSubnetName'))]",
+		"trustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('trustSubnetName'))]",
+		"subnets": [
+			{
+				"name": "[parameters('mgmtSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('mgmtSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-mgmt'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('untrustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('untrustSubnetPrefix')]"
+				}
+			},
+			{
+				"name": "[parameters('trustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('trustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			}
+			
+		]
+	},
+	"resources": [
+
+		{
+			"type": "Microsoft.Network/routeTables",
+			"name": "RT-Outbound",
+			"apiVersion": "2016-03-30",
+			"location": "[resourceGroup().location]",
+			"properties": {
+				"routes": [
+					{
+						"name": "Webroute-Default",
+						"properties": {
+							"addressPrefix": "0.0.0.0/0",
+							"nextHopType": "VirtualAppliance",
+							"nextHopIpAddress": "[parameters('loadBalancerIP')]"
+						}
+					}
+				]
+			}
+		}
+	],
+	"outputs": {
+		"virtualNetworkName": {
+			"value": "[variables('virtualNetworkName')]",
+			"type": "string"
+		}
+	}
+}

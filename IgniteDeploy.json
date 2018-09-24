@@ -1,0 +1,514 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"DeployJumpBox": {
+			"type": "string",
+			"allowedValues": [
+				"yes",
+				"no"
+			],
+			"defaultValue": "no",
+			"metadata": {
+				"description": "Deploy a Windows Jumpbox in management subnet"
+			}
+		},
+		"vnetNewOrExisting": {
+			"type": "string",
+			"allowedValues": [
+				"new",
+				"existing"
+			],
+			"defaultValue": "new",
+			"metadata": {
+				"description": "Identify whether to use a new or existing vnet"
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"defaultValue": "hub-vnet",
+			"metadata": {
+				"description": "Virtual Network Name"
+			}
+		},
+		"vnetResourceGroup": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Resource Group containing the VNET "
+			}
+		},
+		"virtualNetworkAddressPrefix": {
+			"type": "string",
+			"defaultValue": "10.0.0.0/16",
+			"metadata": {
+				"description": "CIDR for Virtual Network"
+			}
+		},
+		"storageName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of the storage account created to store the VM's disks.  Storage account name must be globally unique."
+			},
+			"defaultValue": "lbstor"
+		},
+		"mgmtSubnetName": {
+			"type": "string",
+			"defaultValue": "Mgmt",
+			"metadata": {
+				"description": "Subnet for Management Network"
+			}
+		},
+		"mgmtSubnetPrefix": {
+			"type": "string",
+			"defaultValue": "10.0.0.0/24",
+			"metadata": {
+				"description": "CIDR for Management Network"
+			}
+		},
+		"deployEgressFirewall": {
+			"type": "string",
+			"defaultValue": "no",
+			"allowedValues": [
+				"no",
+				"yes"
+			],
+			"metadata": {
+				"description": "Deploy firewall for ip based traffic"
+			}
+		},
+		"EgressFWBootstrapUri": {
+			"type": "string",
+			"defaultValue": "",
+			"metadata": {
+				"description": "Egress FW Bootstrap disk storage account URI with container name"
+			}
+		},
+		"EgressFWBootstrapUriSizeGB": {
+			"type": "string",
+			"defaultValue": "1",
+			"metadata": {
+				"description": "Egress bootstrap disk disk in GB"
+			}
+		},
+		"untrustSubnetName": {
+			"type": "string",
+			"defaultValue": "EgressFW-Untrust",
+			"metadata": {
+				"description": "Subnet for Egress firewall Untrust Network"
+			}
+		},
+		"untrustSubnetPrefix": {
+			"type": "string",
+			"defaultValue": "10.0.1.0/24",
+			"metadata": {
+				"description": "CIDR for Egress firewall Untrust Network"
+			}
+		},
+		"trustSubnetName": {
+			"type": "string",
+			"defaultValue": "EgressFW-Trust",
+			"metadata": {
+				"description": "Subnet for Egress firewall Trust Network"
+			}
+		},
+		"trustSubnetPrefix": {
+			"type": "string",
+			"defaultValue": "10.0.2.0/24",
+			"metadata": {
+				"description": "Subnet for Egress firewall Trust Network"
+			}
+		},
+		"mgmtPublicIPName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name prefix of public IP resource for Management interface of VM-Series firewall."
+			},
+			"defaultValue": "mgmt-pip"
+		},
+		"loadBalancerName": {
+			"type": "string",
+			"metadata": {
+				"description": "Prefix for loadbalancer Names"
+			},
+			"defaultValue": "panwfwlb"
+		},
+		"loadBalancerIP": {
+			"type": "string",
+			"metadata": {
+				"description": "IP Address for the egress load balancer"
+			},
+			"defaultValue": "10.0.2.100"
+		},
+		"firewallModel": {
+			"type": "string",
+			"defaultValue": "bundle1",
+			"allowedValues": [
+				"byol",
+				"bundle1",
+				"bundle2"
+			],
+			"metadata": {
+				"description": "byol = Bring Your Own License; bundle1 = Bundle 1 PAYG (Hourly); bundle2 = Bundle 2 PAYG (Hourly)"
+			}
+		},
+		"firewallVmName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name prefix for firewalls"
+			},
+			"defaultValue": "panwfw"
+		},
+		"firewallVmSize": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_DS3_v2",
+				"Standard_DS4_v2",
+				"Standard_DS5_v2"
+			],
+			"metadata": {
+				"description": "Azure VM size for VM-Series"
+			},
+			"defaultValue": "Standard_DS3_v2"
+		},
+		"authenticationType": {
+			"type": "string",
+			"metadata": {
+				"description": "Type of administrator user authentication "
+			},
+			"allowedValues": [
+				"sshPublicKey",
+				"password"
+			],
+			"defaultValue": "password"
+		},
+		"username": {
+			"type": "string",
+			"defaultValue": "pandemo",
+			"metadata": {
+				"description": "Username of the administrator account of VM instances"
+			}
+		},
+		"password": {
+			"type": "securestring",
+			"defaultValue": "Dem0pa$$w0rd",
+			"metadata": {
+				"description": "Password for the administrator account of all VM instances. Must be specified if Authentication Type is 'password'."
+			}
+		},
+		"mgmtPublicIPDns": {
+			"type": "string",
+			"metadata": {
+				"description": "DNS Name prefix of public IP resource for Management interface of VM-Series firewall.  Name must be globally unique."
+			},
+			"defaultValue": "fwpubip"
+		},
+		"networkSecurityGroupName": {
+			"type": "string",
+			"defaultValue": "nsg",
+			"metadata": {
+				"description": "Network Security Group Name"
+			}
+		},
+		"networkSecurityGroupInboundIP": {
+			"type": "string",
+			"metadata": {
+				"description": "Your source public IP address. Added to the inbound NSG on eth0 (MGMT), to restrict access to the deployment."
+			},
+			"defaultValue": "0.0.0.0/0"
+		}
+	},
+	"variables": {
+		"vnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+		"egressloadBalancerName": "[concat(parameters('loadBalancerName'),'EgressFW')]",
+		"ipLoadBalancerSku": "Standard",
+		"baseUrl": "https://raw.githubusercontent.com/jharris10/azure-svcs-hub/master",
+		"deployEgressFirewallURL": "[concat(variables('baseUrl'),'/nested/DeployEgressFirewall.json')]",
+		"deployEgressLoadBalancerURL": "[concat(variables('baseUrl'),'/nested/DeployEgressLoadBalancer.json')]",
+		"deployStorageURL": "[concat(variables('baseUrl'),'/nested/deployStorage.json')]",
+		"deployNsgURL": "[concat(variables('baseUrl'),'/nested/deployNsg.json')]",
+		"vnetURL": "[concat(variables('baseUrl'),'/nested/vnet-',parameters('vnetNewOrExisting'),'.json')]",
+		"deployVnetURL": "[concat(variables('baseUrl'),'/nested/deployVnet.json')]",
+		"deployJumpBoxURL":"[concat(variables('baseUrl'),'/nested/DeployJumpBox.json')]",
+		"location": "[resourceGroup().location]",
+		"virtualNetworkRG": "vnetrg",
+		"egressfwrg": "egressfwrg",
+		"vnetrg": "vnetrg",
+		"mgtrg":"mgtrg",
+		"rgname": "[resourceGroup().name]",
+		"egressfwstor": "[concat(parameters('storageName'),'egress')]",
+		"ipfwstor": "[concat(parameters('storageName'),'ipfw')]",
+		"appgwfwstor": "[concat(parameters('storageName'),'appgwfw')]"
+	},
+	"resources": [
+		{
+			"name": "deployNsg",
+			"apiVersion": "2017-05-10",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "[variables('vnetrg')]",
+			
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('deployNsgURL')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"location": {
+						"value": "[variables('location')]"
+					},
+					"nsgName": {
+						"value": "[parameters('networkSecurityGroupName')]"
+					},
+					"srcIPInboundNSG": {
+						"value": "[parameters('networkSecurityGroupInboundIP')]"
+					},
+					"virtualNetworkAddressPrefix": {
+						"value": "[parameters('virtualNetworkAddressPrefix')]"
+					}
+				}
+			}
+		},
+		{
+			"condition": "[equals(parameters('DeployJumpBox'), 'yes')]",
+			"name": "DeployJumpBox",
+			"apiVersion": "2017-05-10",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "[variables('vnetrg')]",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/deployVNet"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('deployJumpBoxURL')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"addressPrefix": {
+						"value": "[parameters('virtualNetworkAddressPrefix')]"
+					},
+					"subnetPrefix": {
+						"value": "[parameters('mgmtSubnetPrefix')]"
+					},
+					"virtualNetworkName": {
+						"value": "[parameters('virtualNetworkName')]"
+					},
+					"subnetName": {
+						"value": "[parameters('mgmtSubnetName')]"
+					},
+					"vmSku": {
+						"value": "Standard_A1"
+					},
+					"windowsOSVersion": {
+						"value": "2016-Datacenter"
+					},
+					"vmssName": {
+						"value": "newvmss"
+					},
+					"adminUsername": {
+						"value": "[parameters('username')]"
+					},
+					"adminPassword": {
+						"value": "[parameters('password')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "2017-05-10",
+			"name": "DeployVnet",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "[variables('vnetrg')]",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/deployNsg"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('vnetURL')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"nsgName": {
+						"value": "[parameters('networkSecurityGroupName')]"
+					},
+					"virtualNetworkName": {
+						"value": "[parameters('virtualNetworkName')]"
+					},
+					"virtualNetworkAddressPrefix": {
+						"value": "[parameters('virtualNetworkAddressPrefix')]"
+					},
+					"mgmtSubnetName": {
+						"value": "[parameters('mgmtSubnetName')]"
+					},
+					"untrustSubnetName": {
+						"value": "[parameters('untrustSubnetName')]"
+					},
+					"ipFirewalluntrustSubnetName": {
+						"value": "[parameters('ipFirewalluntrustSubnetName')]"
+					},
+					"ipFirewalltrustSubnetName": {
+						"value": "[parameters('ipFirewalltrustSubnetName')]"
+					},
+					"trustSubnetName": {
+						"value": "[parameters('trustSubnetName')]"
+					},
+					"loadBalancerIP": {
+						"value": "[parameters('loadBalancerIP')]"
+					},
+					"appGwUntrustSubnetName": {
+						"value": "[parameters('appGwUntrustSubnetName')]"
+					},
+					"appGwTrustSubnetName": {
+						"value": "[parameters('appGwTrustSubnetName')]"
+					},
+					"AppGWSubnetName": {
+						"value": "[parameters('appGatewaySubnetName')]"
+					},
+					"mgmtSubnetPrefix": {
+						"value": "[parameters('mgmtSubnetPrefix')]"
+					},
+					"untrustSubnetPrefix": {
+						"value": "[parameters('untrustSubnetPrefix')]"
+					},
+					"trustSubnetPrefix": {
+						"value": "[parameters('trustSubnetPrefix')]"
+					},
+					"ipFirewalluntrustSubnetPrefix": {
+						"value": "[parameters('ipFirewalluntrustSubnetPrefix')]"
+					},
+					"ipFirewalltrustSubnetPrefix": {
+						"value": "[parameters('ipFirewalltrustSubnetPrefix')]"
+					},
+					"appGwTrustSubnetPrefix": {
+						"value": "[parameters('appGwTrustSubnetPrefix')]"
+					},
+					"appGwUntrustSubnetPrefix": {
+						"value": "[parameters('appGwUntrustSubnetPrefix')]"
+					},
+					"AppGWSubnetPrefix": {
+						"value": "[parameters('AppGWSubnetPrefix')]"
+					}
+				}
+			}
+		},
+
+		{
+			"condition": "[equals(parameters('deployEgressFirewall'), 'yes')]",
+			"name": "DeployEgressFWLoadBalancer",
+			"type": "Microsoft.Resources/deployments",
+			"resourceGroup": "[variables('egressfwrg')]",
+			"apiVersion": "2017-05-10",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/deployVNet"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('deployEgressLoadBalancerURL')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"location": {
+						"value": "[variables('location')]"
+					},
+					"virtualNetworkRG": {
+						"value": "[variables('virtualNetworkRG')]"
+					},
+					"virtualNetworkName": {
+						"value": "[parameters('virtualNetworkName')]"
+					},
+					"subnetName": {
+						"value": "[parameters('trustSubnetName')]"
+					},
+					"loadBalancerName": {
+						"value": "[variables('egressloadBalancerName')]"
+					},
+					"loadBalancerIP": {
+						"value": "[parameters('loadBalancerIP')]"
+					}
+				}
+			}
+		},
+		{
+			"condition": "[equals(parameters('deployEgressFirewall'), 'yes')]",
+			"name": "deployEgressFirewall",
+			"resourceGroup": "[variables('egressfwrg')]",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2017-05-10",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/deployVNet",
+				"Microsoft.Resources/deployments/DeployEgressFWLoadBalancer"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('deployEgressFirewallURL')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"location": {
+						"value": "[variables('location')]"
+					},
+					"baseUrl": {
+						"value": "[variables('baseUrl')]"
+					},
+					"virtualMachineName": {
+						"value": "[concat('EgressFw-', parameters('firewallVmName'))]"
+					},
+					"storageName": {
+						"value": "[variables('egressfwstor')]"
+					},
+					"virtualNetworkRG": {
+						"value": "[variables('virtualNetworkRG')]"
+					},
+					"virtualNetworkName": {
+						"value": "[parameters('virtualNetworkName')]"
+					},
+					"mgmtSubnetName": {
+						"value": "[parameters('mgmtSubnetName')]"
+					},
+					"trustSubnetName": {
+						"value": "[parameters('trustSubnetName')]"
+					},
+					"untrustSubnetName": {
+						"value": "[parameters('untrustSubnetName')]"
+					},
+					"loadBalancerName": {
+						"value": "[variables('egressloadBalancerName')]"
+					},
+					"mgmtPublicIPName": {
+						"value": "[concat('out', parameters('mgmtPublicIPName'))]"
+					},
+					"mgmtPublicIPDns": {
+						"value": "[concat('out', parameters('mgmtPublicIPDns'))]"
+					},
+					"vmSize": {
+						"value": "[parameters('firewallVmSize')]"
+					},
+					"imageSku": {
+						"value": "[parameters('firewallModel')]"
+					},
+					"adminUsername": {
+						"value": "[parameters('username')]"
+					},
+					"adminPassword": {
+						"value": "[parameters('password')]"
+					},
+					"sshKey": {
+						"value": "[parameters('sshPublicKey')]"
+					},
+					"bootstrapUri": {
+						"value": "[parameters('EgressFWBootstrapUri')]"
+					},
+					"bootstrapUriSizeGB": {
+						"value": "[parameters('EgressFWBootstrapUriSizeGB')]"
+					}
+				}
+			}
+		},
+		
+	],
+	"outputs": {}
+}
