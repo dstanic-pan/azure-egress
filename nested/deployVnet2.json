@@ -32,6 +32,18 @@
 				"description": "Subnet for Untrust"
 			}
 		},
+		"ipFirewalluntrustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Untrusted Network"
+			}
+		},
+		"ipFirewalltrustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Untrusted Network"
+			}
+		},
 		"trustSubnetName": {
 			"type": "string",
 			"metadata": {
@@ -42,6 +54,24 @@
 			"type": "string",
 			"metadata": {
 				"description": "Egress LoadBalancer IP"
+			}
+		},
+		"appGwUntrustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Appgw Untrust"
+			}
+		},
+		"appGwTrustSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Appgw Trust"
+			}
+		},
+		"AppGWSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Appgw "
 			}
 		},
 		"mgmtSubnetPrefix": {
@@ -60,6 +90,36 @@
 			"type": "string",
 			"metadata": {
 				"description": "Trust subnet CIDR"
+			}
+		},
+		"ipFirewalluntrustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "CIDR for TCPInbound Untrust Network"
+			}
+		},
+		"ipFirewalltrustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "CIDR for TCPInbound Untrust Network"
+			}
+		},
+		"appGwTrustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Untrusted Network"
+			}
+		},
+		"appGwUntrustSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Untrusted Network"
+			}
+		},
+		"appGwSubnetPrefix": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet mask of Appgw"
 			}
 		}
 	},
@@ -91,6 +151,51 @@
 				"name": "[parameters('trustSubnetName')]",
 				"properties": {
 					"addressPrefix": "[parameters('trustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('ipFirewalluntrustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('ipFirewalluntrustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('ipFirewalltrustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('ipFirewalltrustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('appGwUntrustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('appGwUntrustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('appGwTrustSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('appGwTrustSubnetPrefix')]",
+					"networkSecurityGroup": {
+						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+					}
+				}
+			},
+			{
+				"name": "[parameters('AppGWSubnetName')]",
+				"properties": {
+					"addressPrefix": "[parameters('appGwSubnetPrefix')]",
 					"networkSecurityGroup": {
 						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
 					}
