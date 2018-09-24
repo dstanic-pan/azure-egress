@@ -231,10 +231,10 @@
 		"deployVnetURL": "[concat(variables('baseUrl'),'/nested/deployVnet.json')]",
 		"deployJumpBoxURL":"[concat(variables('baseUrl'),'/nested/DeployJumpBox.json')]",
 		"location": "[resourceGroup().location]",
-		"virtualNetworkRG": "vnetrg",
-		"egressfwrg": "egressfwrg",
-		"vnetrg": "vnetrg",
-		"mgtrg":"mgtrg",
+		"virtualNetworkRG": "[resourceGroup().name]",
+		"egressfwrg": "[resourceGroup().name]",
+		"vnetrg": "[resourceGroup().name]",
+		"mgtrg":"[resourceGroup().name]",
 		"rgname": "[resourceGroup().name]",
 		"egressfwstor": "[concat(parameters('storageName'),'egress')]",
 		"ipfwstor": "[concat(parameters('storageName'),'ipfw')]",
@@ -507,8 +507,7 @@
 					}
 				}
 			}
-		},
-		
+		}	
 	],
 	"outputs": {}
 }
