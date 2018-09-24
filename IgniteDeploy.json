@@ -222,7 +222,7 @@
 		"vnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
 		"egressloadBalancerName": "[concat(parameters('loadBalancerName'),'EgressFW')]",
 		"ipLoadBalancerSku": "Standard",
-		"baseUrl": "https://github.com/dstanic-pan/azure-egress/tree/master",
+		"baseUrl": "https://raw.githubusercontent.com/dstanic-pan/azure-egress/master",
 		"deployEgressFirewallURL": "[concat(variables('baseUrl'),'/nested/DeployEgressFirewall.json')]",
 		"deployEgressLoadBalancerURL": "[concat(variables('baseUrl'),'/nested/DeployEgressLoadBalancer.json')]",
 		"deployStorageURL": "[concat(variables('baseUrl'),'/nested/deployStorage.json')]",
@@ -345,26 +345,11 @@
 					"untrustSubnetName": {
 						"value": "[parameters('untrustSubnetName')]"
 					},
-					"ipFirewalluntrustSubnetName": {
-						"value": "[parameters('ipFirewalluntrustSubnetName')]"
-					},
-					"ipFirewalltrustSubnetName": {
-						"value": "[parameters('ipFirewalltrustSubnetName')]"
-					},
 					"trustSubnetName": {
 						"value": "[parameters('trustSubnetName')]"
 					},
 					"loadBalancerIP": {
 						"value": "[parameters('loadBalancerIP')]"
-					},
-					"appGwUntrustSubnetName": {
-						"value": "[parameters('appGwUntrustSubnetName')]"
-					},
-					"appGwTrustSubnetName": {
-						"value": "[parameters('appGwTrustSubnetName')]"
-					},
-					"AppGWSubnetName": {
-						"value": "[parameters('appGatewaySubnetName')]"
 					},
 					"mgmtSubnetPrefix": {
 						"value": "[parameters('mgmtSubnetPrefix')]"
@@ -374,21 +359,6 @@
 					},
 					"trustSubnetPrefix": {
 						"value": "[parameters('trustSubnetPrefix')]"
-					},
-					"ipFirewalluntrustSubnetPrefix": {
-						"value": "[parameters('ipFirewalluntrustSubnetPrefix')]"
-					},
-					"ipFirewalltrustSubnetPrefix": {
-						"value": "[parameters('ipFirewalltrustSubnetPrefix')]"
-					},
-					"appGwTrustSubnetPrefix": {
-						"value": "[parameters('appGwTrustSubnetPrefix')]"
-					},
-					"appGwUntrustSubnetPrefix": {
-						"value": "[parameters('appGwUntrustSubnetPrefix')]"
-					},
-					"AppGWSubnetPrefix": {
-						"value": "[parameters('AppGWSubnetPrefix')]"
 					}
 				}
 			}
