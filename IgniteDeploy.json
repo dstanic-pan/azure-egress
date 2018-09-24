@@ -222,7 +222,7 @@
 		"vnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
 		"egressloadBalancerName": "[concat(parameters('loadBalancerName'),'EgressFW')]",
 		"ipLoadBalancerSku": "Standard",
-		"baseUrl": "https://raw.githubusercontent.com/jharris10/azure-svcs-hub/master",
+		"baseUrl": "https://github.com/dstanic-pan/azure-egress/",
 		"deployEgressFirewallURL": "[concat(variables('baseUrl'),'/nested/DeployEgressFirewall.json')]",
 		"deployEgressLoadBalancerURL": "[concat(variables('baseUrl'),'/nested/DeployEgressLoadBalancer.json')]",
 		"deployStorageURL": "[concat(variables('baseUrl'),'/nested/deployStorage.json')]",
