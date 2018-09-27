@@ -11,8 +11,48 @@
             ],
             "metadata": {
                 "description": "Azure VM size for VM-Series"
-            }
+            },
+            "defaultValue": "Standard_D3_v2"
         },
+        "imageVersion": {
+            "type": "string",
+            "allowedValues": [
+               "7.1.1",
+               "8.0.0'",
+               "8.1.0",
+               "latest"
+            ],
+            "metadata": {
+               "description": "PAN OS Version"
+            },
+            "defaultValue": "latest"
+         },
+         "imageSku": {
+            "type": "string",
+            "allowedValues": [
+               "byol",
+               "bundle1",
+               "bundle2"
+            ],
+            "metadata": {
+               "description": "Firewall License Model"
+            },
+            "defaultValue": "byol"
+         },
+         "virtualNetworkName": { 
+           "type": "string",
+           "metadata": {
+             "description": "Name of the Virtual Network (VNET)"
+           },
+           "defaultValue": "fwVNET"
+         },
+         "virtualNetworkAddressPrefix": {
+           "type": "string",
+           "defaultValue": "10.0.0.0/16",
+           "metadata": {
+             "description": "Virtual network address CIDR"
+           }
+         },
         "Username": {
             "defaultValue": "paloalto",
             "type": "String"
@@ -36,7 +76,7 @@
                     {
                         "name": "Dev-Network",
                         "properties": {
-                            "addressPrefix": "10.0.0.0/16",
+                            "addressPrefix": "[parameters('virtualNetworkAddressPrefix')]",
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "10.0.3.100"
                         }
@@ -210,9 +250,6 @@
             "resources": [],
             "dependsOn": []
         },
-        ,
-        ,
-        ,
         {
             "type": "Microsoft.Network/loadBalancers",
             "name": "LB-Egress",
@@ -494,7 +531,6 @@
                 ]
             }
         },
-        ,
 	{
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "Allow-All",
@@ -650,29 +686,14 @@
             "resources": [],
             "dependsOn": []
         },
-        {
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "AS-Web",
-            "apiVersion": "2016-04-30-preview",
-            "location": "[resourceGroup().location]",
-            "tags": {},
-            "properties": {
-                "platformUpdateDomainCount": 2,
-                "platformFaultDomainCount": 2
-            },
-		"sku": {
-			"name": "Aligned"
-		},
-            "resources": [],
-            "dependsOn": []
-        },
+
         {
             "apiVersion": "2016-04-30-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "VM-FW1",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "byol",
+                "name": "[parameters('imageSku')]",
                 "product": "vmseries1",
                 "publisher": "paloaltonetworks"
             },
@@ -692,8 +713,8 @@
                     "imageReference": {
                         "publisher": "paloaltonetworks",
                         "offer": "vmseries1",
-                        "sku": "byol",
-                        "version": "8.0.0"
+                        "sku": "[parameters('imageSku')]",
+                        "version": "[parameters('imageVersion')]"
                     },
                     "osDisk": {
                         "managedDisk": { "storageAccountType": "Premium_LRS" },
@@ -739,7 +760,7 @@
             "name": "VM-FW2",
             "location": "[resourceGroup().location]",
             "plan": {
-                "name": "byol",
+                "name": "[parameters('imageSku')]",
                 "product": "vmseries1",
                 "publisher": "paloaltonetworks"
             },
@@ -759,8 +780,8 @@
                     "imageReference": {
                         "publisher": "paloaltonetworks",
                         "offer": "vmseries1",
-                        "sku": "byol",
-                        "version": "8.0.0"
+                        "sku": "[parameters('imageSku')]",
+                        "version": "[parameters('imageVersion')]"
                     },
                     "osDisk": {
                         "managedDisk": { "storageAccountType": "Premium_LRS" },
@@ -856,7 +877,6 @@
         }
       }
     },
-    
     ],
     "outputs": {
         "firewall 1 management": {
