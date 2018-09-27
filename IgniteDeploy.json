@@ -240,7 +240,7 @@
 		"deployEgressLoadBalancerURL": "[concat(variables('baseUrl'),'/nested/DeployEgressLoadBalancer.json')]",
 		"deployStorageURL": "[concat(variables('baseUrl'),'/nested/deployStorage.json')]",
 		"deployNsgURL": "[concat(variables('baseUrl'),'/nested/deployNsg.json')]",
-		"vnetURL": "[concat(variables('baseUrl'),'/nested/vnet-',parameters('vnetNewOrExisting'),'.json')]",
+		"vnetURL": "[concat(variables('baseUrl'),'/nested/vnet-',parameters('vnetNewOrExisting'),'2.json')]",
 		"deployVnetURL": "[concat(variables('baseUrl'),'/nested/deployVnet.json')]",
 		"deployJumpBoxURL":"[concat(variables('baseUrl'),'/nested/DeployJumpBox.json')]",
 		"location": "[resourceGroup().location]",
