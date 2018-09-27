@@ -221,7 +221,6 @@
 	"variables": {
 		"vnetID": "[resourceId(parameters('vnetResourceGroup'),'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
 		"egressloadBalancerName": "[concat(parameters('loadBalancerName'),'EgressFW')]",
-		"ipLoadBalancerSku": "Standard",
 		"baseUrl": "https://raw.githubusercontent.com/dstanic-pan/azure-egress/master",
 		"deployEgressFirewallURL": "[concat(variables('baseUrl'),'/nested/DeployEgressFirewall.json')]",
 		"deployEgressLoadBalancerURL": "[concat(variables('baseUrl'),'/nested/DeployEgressLoadBalancer.json')]",

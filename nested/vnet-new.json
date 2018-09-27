@@ -38,6 +38,12 @@
 				"description": "Subnet for Trust"
 			}
 		},
+		"devSubnetName": {
+			"type": "string",
+			"metadata": {
+				"description": "Subnet for Dev"
+			}
+		},
 		"loadBalancerIP": {
 			"type": "string",
 			"metadata": {
@@ -60,8 +66,14 @@
 			"type": "string",
 			"metadata": {
 				"description": "Trust subnet CIDR"
+			},
+		"devSubnetPrefix": {
+				"type": "string",
+				"metadata": {
+					"description": "Dev subnet CIDR"
+				}
 			}
-		}	
+		}
 	},
 	"variables": {
 		"location": "[resourceGroup().location]",
@@ -70,51 +82,9 @@
 		"vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
 		"mgmtSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('mgmtSubnetName'))]",
 		"untrustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('untrustSubnetName'))]",
-		"trustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('trustSubnetName'))]",
-		"subnets": [
-			{
-				"name": "[parameters('mgmtSubnetName')]",
-				"properties": {
-					"addressPrefix": "[parameters('mgmtSubnetPrefix')]",
-					"networkSecurityGroup": {
-						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-mgmt'))]"
-					}
-				}
-			},
-			{
-				"name": "[parameters('untrustSubnetName')]",
-				"properties": {
-					"addressPrefix": "[parameters('untrustSubnetPrefix')]"
-				}
-			},
-			{
-				"name": "[parameters('trustSubnetName')]",
-				"properties": {
-					"addressPrefix": "[parameters('trustSubnetPrefix')]",
-					"networkSecurityGroup": {
-						"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
-					}
-				}
-			}
-			
-		]
+		"trustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('trustSubnetName'))]"
 	},
 	"resources": [
-
-		{
-				"name": "[variables('virtualNetworkName')]",
-				"type": "Microsoft.Network/virtualNetworks",
-				"location": "[variables('location')]",
-				"apiVersion": "2015-06-15",
-				"properties": {
-					"addressSpace": {
-						"addressPrefixes": [
-							"[parameters('virtualNetworkAddressPrefix')]"
-						]
-					},
-					"subnets": "[variables('subnets')]"
-				}
-		},
 		{
 			"type": "Microsoft.Network/routeTables",
 			"name": "RT-Outbound",
@@ -132,7 +102,57 @@
 					}
 				]
 			}
-		}
+		},
+		{
+            "apiVersion": "2016-06-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters(virtualNetworkName)",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes":"[parameters(virtualNetworkAddressPrefix)"             
+                },
+                "subnets": [
+					{
+						"name": "[parameters('mgmtSubnetName')]",
+						"properties": {
+							"addressPrefix": "[parameters('mgmtSubnetPrefix')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-mgmt'))]"
+							}
+						}
+					},
+					{
+						"name": "[parameters('untrustSubnetName')]",
+						"properties": {
+							"addressPrefix": "[parameters('untrustSubnetPrefix')]"
+						}
+					},
+					{
+						"name": "[parameters('trustSubnetName')]",
+						"properties": {
+							"addressPrefix": "[parameters('trustSubnetPrefix')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+							}
+						}
+					},
+					{
+						"name": "[parameters('devSubnetName')]",
+						"properties": {
+							"addressPrefix": "[parameters('devSubnetPrefix')]",
+							"networkSecurityGroup": {
+								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
+							}
+						}
+					}
+				]
+			},
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', 'RT-Web')]"
+            ]
+        }
+
 	],
 	"outputs": {
 		"virtualNetworkName": {
