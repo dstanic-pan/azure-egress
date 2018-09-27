@@ -343,9 +343,6 @@
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
-					"nsgName": {
-						"value": "[parameters('networkSecurityGroupName')]"
-					},
 					"virtualNetworkName": {
 						"value": "[parameters('virtualNetworkName')]"
 					},
