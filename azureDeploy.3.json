@@ -213,7 +213,7 @@
                                 "id": "[resourceId('Microsoft.Network/routeTables', 'RT-Dev')]"
                             },
 				"networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Allow-All')]"
                             }
                         }
                     }
@@ -296,25 +296,6 @@
                 "idleTimeoutInMinutes": 4,
                 "dnsSettings": {
                     "domainNameLabel": "[concat('fw2untrust', variables('uniqueId'))]"
-                }
-            },
-            "resources": [],
-            "dependsOn": []
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "IP-Dev-Management",
-            "apiVersion": "2017-08-01",
-            "location": "[resourceGroup().location]",
-		"sku":
-            {
-                "name": "Standard"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Static",
-                "idleTimeoutInMinutes": 4,
-                "dnsSettings": {
-                    "domainNameLabel": "[concat('devmanagement', variables('uniqueId'))]"
                 }
             },
             "resources": [],
@@ -562,10 +543,9 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "INT-Dev-Management",
+            "name": "INT-Dev",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-Dev-Management')]",
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
             ],
             "properties": {
@@ -575,9 +555,6 @@
                         "name": "Dev",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-Dev-Management')]"
-                            },
                             "subnet": {
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Dev')]"
                             },
@@ -587,7 +564,6 @@
                 ]
             }
         },
-        
 	{
             "type": "Microsoft.Network/networkSecurityGroups",
             "name": "Management",
@@ -1038,7 +1014,7 @@
       "name": "VM-Dev",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces/', 'INT-Dev-Management')]"
+        "[resourceId('Microsoft.Network/networkInterfaces/', 'INT-Dev')]"
       ],
       "properties": {
                 "hardwareProfile": {
@@ -1073,7 +1049,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-Dev-Management')]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-Dev')]"
             }
           ]
         },
