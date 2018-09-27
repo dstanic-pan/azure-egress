@@ -15,6 +15,7 @@
 		},
 		"virtualNetworkAddressPrefix": {
 			"type": "string",
+			"defaultValue": "10.0.0.0/16",
 			"metadata": {
 				"description": "CIDR for vnet"
 			}
@@ -110,7 +111,7 @@
             "location": "[resourceGroup().location]",
             "properties": {
                 "addressSpace": {
-					"addressPrefixes":"[parameters('virtualNetworkAddressPrefix')"           
+					"addressPrefixes":"[parameters('virtualNetworkAddressPrefix')]"           
                 },
                 "subnets": [
 					{
