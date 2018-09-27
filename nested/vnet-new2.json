@@ -86,8 +86,7 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
     "mgmtSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('mgmtSubnetName'))]",
     "untrustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('untrustSubnetName'))]",
-    "trustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('trustSubnetName'))]"
-  },
+    "trustSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('trustSubnetName'))]",
     "subnets": [
       {
         "name": "[parameters('mgmtSubnetName')]",
