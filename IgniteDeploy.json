@@ -119,6 +119,18 @@
 				"description": "Subnet for Egress firewall Trust Network"
 			}
 		},
+		"devSubnetName": {
+			"type": "string",
+			"defaultValue": "Dev",
+			"metadata": {
+				"description": "Subnet for Dev VM's"
+			},
+		"devSubnetPrefix": {
+				"type": "string",
+				"defaultValue": "10.0.3.0/24",
+				"metadata": {
+					"description": "Subnet for Dev Network"
+				},
 		"mgmtPublicIPName": {
 			"type": "string",
 			"metadata": {
