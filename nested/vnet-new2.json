@@ -4,7 +4,7 @@
   "parameters": {
     "nsgName": {
       "type": "string",
-      "defaultValue": "nsg-default1"
+      "defaultValue": "nsg"
     },
     "virtualNetworkName": {
       "type": "string",

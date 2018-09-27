@@ -4,7 +4,7 @@
 	"parameters": {
 		"nsgName": {
 			"type": "string",
-			"defaultValue": "nsg-default1"
+			"defaultValue": "nsg"
 		},
 		"virtualNetworkName": {
 			"type": "string",
@@ -141,10 +141,7 @@
 					{
 						"name": "[parameters('devSubnetName')]",
 						"properties": {
-							"addressPrefix": "[parameters('devSubnetPrefix')]",
-							"networkSecurityGroup": {
-								"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-trust'))]"
-							}
+							"addressPrefix": "[parameters('devSubnetPrefix')]"
 						}
 					}
 				]
