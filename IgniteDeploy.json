@@ -124,12 +124,14 @@
 			"defaultValue": "Dev",
 			"metadata": {
 				"description": "Subnet for Dev VM's"
+			}
 			},
 		"devSubnetPrefix": {
 				"type": "string",
 				"defaultValue": "10.0.3.0/24",
 				"metadata": {
 					"description": "Subnet for Dev Network"
+				}
 				},
 		"mgmtPublicIPName": {
 			"type": "string",
@@ -359,6 +361,9 @@
 					"trustSubnetName": {
 						"value": "[parameters('trustSubnetName')]"
 					},
+					"devSubnetName": {
+						"value": "[parameters('devSubnetName')]"
+					},
 					"loadBalancerIP": {
 						"value": "[parameters('loadBalancerIP')]"
 					},
@@ -370,6 +375,9 @@
 					},
 					"trustSubnetPrefix": {
 						"value": "[parameters('trustSubnetPrefix')]"
+					},
+					"devSubnetPrefix": {
+						"value": "[parameters('devSubnetPrefix')]"
 					}
 				}
 			}

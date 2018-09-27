@@ -66,15 +66,15 @@
 			"type": "string",
 			"metadata": {
 				"description": "Trust subnet CIDR"
-			},
+			}
+		},
 		"devSubnetPrefix": {
-				"type": "string",
-				"metadata": {
-					"description": "Dev subnet CIDR"
-				}
+			"type": "string",
+			"metadata": {
+				"description": "Dev subnet CIDR"
 			}
 		}
-	},
+		},
 	"variables": {
 		"location": "[resourceGroup().location]",
 		"rgname": "[resourceGroup().id]",
@@ -87,13 +87,13 @@
 	"resources": [
 		{
 			"type": "Microsoft.Network/routeTables",
-			"name": "RT-Outbound",
+			"name": "RT-Dev",
 			"apiVersion": "2016-03-30",
 			"location": "[resourceGroup().location]",
 			"properties": {
 				"routes": [
 					{
-						"name": "Webroute-Default",
+						"name": "Devroute-Default",
 						"properties": {
 							"addressPrefix": "0.0.0.0/0",
 							"nextHopType": "VirtualAppliance",
@@ -106,11 +106,11 @@
 		{
             "apiVersion": "2016-06-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[parameters(virtualNetworkName)",
+            "name": "[parameters('virtualNetworkName')",
             "location": "[resourceGroup().location]",
             "properties": {
                 "addressSpace": {
-                    "addressPrefixes":"[parameters(virtualNetworkAddressPrefix)"             
+                    "addressPrefixes":"[parameters('virtualNetworkAddressPrefix')]"             
                 },
                 "subnets": [
 					{
@@ -149,7 +149,7 @@
 				]
 			},
             "dependsOn": [
-                "[resourceId('Microsoft.Network/routeTables', 'RT-Web')]"
+                "[resourceId('Microsoft.Network/routeTables', 'RT-Dev')]"
             ]
         }
 
