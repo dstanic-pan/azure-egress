@@ -109,17 +109,14 @@
               "properties": {
                 "addressPrefix": "[parameters('mgmtSubnetPrefix')]",
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('nsgName'), '-mgmt'))]"
                 }
               }
             },
             {
               "name": "[parameters('untrustSubnetName')]",
               "properties": {
-                "addressPrefix": "[parameters('untrustSubnetPrefix')]",
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('virtualNetworkName'), '-untnsg'))]"
-                }
+                "addressPrefix": "[parameters('untrustSubnetPrefix')]"
               }
             },
             {
