@@ -106,7 +106,7 @@
 		{
             "apiVersion": "2016-06-01",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[parameters('virtualNetworkName')",
+            "name": "[parameters('virtualNetworkName')]",
             "location": "[resourceGroup().location]",
             "properties": {
                 "addressSpace": {
