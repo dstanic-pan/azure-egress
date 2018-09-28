@@ -141,11 +141,18 @@
              "metadata": {
                      "description": "The file share in the storage account where the bootstrap files are located"
                  }
-                }
-         },
+        },
+            "StorageAccountFileShareDirectory": {
+                "defaultValue": "",
+                "type": "String",
+                "metadata": {
+                "description": "The subdirectory hosting the bootstrap files. Only required if hosting multiple bootstrap directories on the same share"
+                        }
+                    }
+                    },
     "variables": {
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "customDataField": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'))]"
+        "customDataField": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('StorageAccountFileShareDirectory'))]"
     },
     "resources": [
         {
