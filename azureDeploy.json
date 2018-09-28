@@ -107,7 +107,7 @@
             "type": "string",
             "defaultValue": "0.0.0.0/0",
              "metadata": {
-            "description": "Source Public IP for access to FW Management"
+            "description": "Your source public IP address (or range) to restrict access to FW Management"
              }
         },
          "bootstrapFirewall": {
