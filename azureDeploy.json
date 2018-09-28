@@ -109,10 +109,43 @@
              "metadata": {
             "description": "Source Public IP for access to FW Management"
              }
-            }
-      },
+        },
+         "bootstrapFirewall": {
+             "type": "string",
+                "allowedValues": [
+                "no",
+                "yes"
+        ],
+        "metadata": {
+           "description": "Do you want to bootstrap the firewall?"
+        },
+        "defaultValue": "no"
+     },
+     "BootstrapStorageAccount": {
+             "defaultValue": "",
+             "type": "String",
+             "metadata": {
+                     "description": "Storage account hosting the bootstrap files"
+                 }
+         },
+         "StorageAccountAccessKey": {
+             "defaultValue": "",
+             "type": "String",
+             "metadata": {
+                     "description": "Authentication key to access the storage account"
+                 }
+         },
+         "StorageAccountFileShare": {
+             "defaultValue": "",
+             "type": "String",
+             "metadata": {
+                     "description": "The file share in the storage account where the bootstrap files are located"
+                 }
+                }
+         },
     "variables": {
-        "uniqueId": "[uniqueString(resourceGroup().id)]"
+        "uniqueId": "[uniqueString(resourceGroup().id)]",
+        "customDataField": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('StorageAccountFileShareDirectory'))]"
     },
     "resources": [
         {
@@ -900,6 +933,7 @@
 
         {
             "apiVersion": "2016-04-30-preview",
+            "condition": "[equals(parameters('bootstrapFirewall'),'yes')]",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "VM-FW1",
             "location": "[resourceGroup().location]",
@@ -918,7 +952,8 @@
                 "osProfile": {
                     "computerName": "VM-FW1",
           "adminUsername": "[parameters('Username')]",
-          "adminPassword": "[parameters('Password')]"
+          "adminPassword": "[parameters('Password')]",
+          "customData": "[base64(variables('customDataField'))]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -967,6 +1002,7 @@
         },
         {
             "apiVersion": "2016-04-30-preview",
+            "condition": "[equals(parameters('bootstrapFirewall'),'yes')]",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "VM-FW2",
             "location": "[resourceGroup().location]",
@@ -985,7 +1021,8 @@
                 "osProfile": {
                     "computerName": "VM-FW2",
           "adminUsername": "[parameters('Username')]",
-          "adminPassword": "[parameters('Password')]"
+          "adminPassword": "[parameters('Password')]",
+          "customData": "[base64(variables('customDataField'))]"
                 },
                 "storageProfile": {
                     "imageReference": {
