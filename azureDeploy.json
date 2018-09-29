@@ -503,7 +503,7 @@
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('managementSubnetName'))]"
                             },
                      "dependsOn": [
-                            "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Management')]"
+                            "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Management')]"
                           ]
                         }
                     }
@@ -558,7 +558,7 @@
                                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('untrustSubnetName'))]"
                             },
                             "dependsOn": [
-                                "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Untrust')]"
+                                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Untrust')]"
                               ]
                         }
                     }
@@ -621,7 +621,7 @@
                             ]
                         },
                         "dependsOn": [
-                            "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Trust')]"
+                            "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Trust')]"
                           ]
                     }
                 ]
