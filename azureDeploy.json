@@ -469,14 +469,13 @@
                     {
                         "name": "FW1-Management",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW1-Management')]"
                             },
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Management')]"
-                            },
-                            "privateIpAddress": "10.0.0.5"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('managementSubnetName'))]"
+                            }
                         }
                     }
                 ]
@@ -496,14 +495,16 @@
                     {
                         "name": "FW2-Management",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW2-Management')]"
                             },
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Management')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('managementSubnetName'))]"
                             },
-                            "privateIpAddress": "10.0.0.6"
+                     "dependsOn": [
+                            "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Management')]"
+                          ]
                         }
                     }
                 ]
@@ -523,13 +524,12 @@
                 	{
 						"name": "FW1-Untrust",
 						"properties": {
-                            "privateIpAddress": "10.0.1.5",
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
 							"publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW1-Untrust')]"
                             },                            "primary": true,
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Untrust')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('untrustSubnetName'))]"
                             }                 
                         }
                     }
@@ -550,14 +550,16 @@
                     {
                         "name": "FW2-Untrust",
                         "properties": {
-                            "privateIPAddress": "10.0.1.6",
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW2-Untrust')]"
                             },
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Untrust')]"
-                            }
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('untrustSubnetName'))]"
+                            },
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Untrust')]"
+                              ]
                         }
                     }
                 ]
@@ -579,11 +581,10 @@
                     {
                         "name": "FW1-Trust",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Trust')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('trustSubnetName'))]"
                             },
-                            "privateIpAddress": "10.0.2.5",
                             "loadBalancerBackendAddressPools": [
                                 {
                                     "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
@@ -609,17 +610,19 @@
                     {
                         "name": "FW2-Trust",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Trust')]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('trustSubnetName'))]"
                             },
-                            "privateIpAddress": "10.0.2.6",
                             "loadBalancerBackendAddressPools": [
                                 {
                                     "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'LB-Egress'), '/backendAddressPools/AS-FW')]"
                                 }
                             ]
-                        }
+                        },
+                        "dependsOn": [
+                            "[resourceId('Microsoft.Network/networkInterfaces', 'IP-FW1-Trust')]"
+                          ]
                     }
                 ]
             }
