@@ -106,27 +106,6 @@
               "description": "Trust Subnet address CIDR"
             }
           },
-          "protectedSubnetName": { 
-            "type": "string",
-            "metadata": {
-              "description": "Name of the protected backend Subnet (Web, Dev, DB)"
-            },
-            "defaultValue": "Dev"
-          },
-          "protectedSubnetAddressPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.4.0/24",
-            "metadata": {
-              "description": "Protected Subnet address CIDR"
-            }
-          },
-          "egressLBFrontEndAddress": {
-            "type": "string",
-            "defaultValue": "10.0.2.100",
-            "metadata": {
-              "description": "IP Address of the inbound load balancer in the Trust network"
-            }
-          },
         "Username": {
             "defaultValue": "paloalto",
             "type": "String"
@@ -199,13 +178,13 @@
                         "properties": {
                             "addressPrefix": "[parameters('virtualNetworkAddressPrefix')]",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[parameters('egressLBFrontEndAddress')]"
+                            "nextHopIpAddress": "10.0.3.100"
                         }
                     },
                     {
                         "name": "Dev-Local",
                         "properties": {
-                            "addressPrefix": "[parameters('protectedSubnetAddressPrefix')]",
+                            "addressPrefix": "10.0.4.0/24",
                             "nextHopType": "VnetLocal"
                         }
                     },
@@ -214,7 +193,7 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "[parameters('egressLBFrontEndAddress')]"
+                            "nextHopIpAddress": "10.0.3.100"
                         }
                     },
                     {
@@ -407,10 +386,10 @@
                     {
                         "name": "LB-Egress-FrontEnd",
                         "properties": {
-                        	"privateIPAddress": "[parameters('egressLBFrontEndAddress')]",
+                        	"privateIPAddress": "10.0.3.100",
                             "privateIPAllocationMethod": "Static",
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('trustSubnetName'))]"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Egress')]"
                             }
                         }
                     }
