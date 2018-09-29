@@ -39,6 +39,17 @@
             },
             "defaultValue": "byol"
          },
+         "vnetNewOrExisting": {
+			"type": "string",
+			"allowedValues": [
+				"new",
+				"existing"
+			],
+			"defaultValue": "new",
+			"metadata": {
+				"description": "Identify whether to use a new or existing vnet"
+			}
+		},
          "virtualNetworkName": { 
            "type": "string",
            "metadata": {
@@ -199,6 +210,7 @@
         },
         {
             "apiVersion": "2016-06-01",
+            "condition": "[equals(parameters('vnetNewOrExisting'),'new')]",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[resourceGroup().location]",
