@@ -2,16 +2,8 @@
 <config urldb="paloaltonetworks" version="8.1.0">
   <mgt-config>
     <users>
-      <entry name="admin">
-        <phash>$1$hdfqucsg$.PEqFCG.phsis9Z1lBS5n/</phash>
-        <permissions>
-          <role-based>
-            <superuser>yes</superuser>
-          </role-based>
-        </permissions>
-      </entry>
       <entry name="paloalto">
-        <phash>$1$rwblbyxg$RV3bPYes7Ga4xi3SEPWkb1</phash>
+        <phash>$1$gnbaoyvd$yRAQM6zJSbn7WqK9Q.mi01</phash>
         <permissions>
           <role-based>
             <superuser>yes</superuser>
@@ -321,6 +313,15 @@
                   </graceful-restart>
                 </routing-options>
               </bgp>
+              <rip>
+                <enable>no</enable>
+              </rip>
+              <ospf>
+                <enable>no</enable>
+              </ospf>
+              <ospfv3>
+                <enable>no</enable>
+              </ospfv3>
             </protocol>
             <interface>
               <member>ethernet1/1</member>
@@ -365,7 +366,7 @@
                       <profile>None</profile>
                     </bfd>
                     <metric>10</metric>
-                    <destination>10.0.4.0/24</destination>
+                    <destination>10.0.3.0/24</destination>
                     <route-table>
                       <unicast/>
                     </route-table>
@@ -389,6 +390,15 @@
                 </routing-options>
                 <enable>no</enable>
               </bgp>
+              <rip>
+                <enable>no</enable>
+              </rip>
+              <ospf>
+                <enable>no</enable>
+              </ospf>
+              <ospfv3>
+                <enable>no</enable>
+              </ospfv3>
             </protocol>
             <interface>
               <member>ethernet1/2</member>
@@ -397,17 +407,17 @@
               <ip>
                 <static-route>
                   <entry name="default">
-                    <path-monitor>
-                      <enable>no</enable>
-                      <failure-condition>any</failure-condition>
-                      <hold-time>2</hold-time>
-                    </path-monitor>
                     <nexthop>
                       <next-vr>Untrust</next-vr>
                     </nexthop>
                     <bfd>
                       <profile>None</profile>
                     </bfd>
+                    <path-monitor>
+                      <enable>no</enable>
+                      <failure-condition>any</failure-condition>
+                      <hold-time>2</hold-time>
+                    </path-monitor>
                     <metric>10</metric>
                     <destination>0.0.0.0/0</destination>
                     <route-table>
@@ -447,7 +457,7 @@
                     </bfd>
                     <interface>ethernet1/2</interface>
                     <metric>10</metric>
-                    <destination>10.0.4.0/24</destination>
+                    <destination>10.0.3.0/24</destination>
                     <route-table>
                       <unicast/>
                     </route-table>
@@ -501,12 +511,13 @@
             <disable-http>yes</disable-http>
           </service>
           <ip-address>10.0.0.5</ip-address>
-          <hostname>VM-FW1</hostname>
+          <hostname>VM-FW2</hostname>
           <netmask>255.255.255.0</netmask>
           <default-gateway>10.0.0.1</default-gateway>
           <dns-setting>
             <servers>
-              <primary>168.63.129.16</primary>
+              <primary>8.8.8.8</primary>
+              <secondary>8.8.4.4</secondary>
             </servers>
           </dns-setting>
           <server-verification>yes</server-verification>
@@ -518,6 +529,8 @@
           <management>
             <hostname-type-in-syslog>FQDN</hostname-type-in-syslog>
             <initcfg>
+              <hostname>VM-FW2</hostname>
+              <username>paloalto</username>
               <type>
                 <dhcp-client>
                   <send-hostname>yes</send-hostname>
@@ -526,12 +539,8 @@
                   <accept-dhcp-domain>no</accept-dhcp-domain>
                 </dhcp-client>
               </type>
-              <ip-address>10.0.0.5</ip-address>
-              <netmask>255.255.255.0</netmask>
-              <default-gateway>10.0.0.1</default-gateway>
-              <dns-primary>168.63.129.16</dns-primary>
-              <username>paloalto</username>
-              <hostname>VM-FW1</hostname>
+              <dns-primary>8.8.8.8</dns-primary>
+              <dns-secondary>8.8.4.4</dns-secondary>
             </initcfg>
             <enable-log-high-dp-load>yes</enable-log-high-dp-load>
             <quota-settings>
@@ -581,37 +590,6 @@
           <rulebase>
             <security>
               <rules>
-                <entry name="Allow web-browsing In">
-                  <to>
-                    <member>Trust</member>
-                  </to>
-                  <from>
-                    <member>Untrust</member>
-                  </from>
-                  <source>
-                    <member>any</member>
-                  </source>
-                  <destination>
-                    <member>any</member>
-                  </destination>
-                  <source-user>
-                    <member>any</member>
-                  </source-user>
-                  <category>
-                    <member>any</member>
-                  </category>
-                  <application>
-                    <member>web-browsing</member>
-                  </application>
-                  <service>
-                    <member>application-default</member>
-                  </service>
-                  <hip-profiles>
-                    <member>any</member>
-                  </hip-profiles>
-                  <action>allow</action>
-                  <rule-type>universal</rule-type>
-                </entry>
                 <entry name="Allow All Out">
                   <to>
                     <member>Untrust</member>
@@ -641,6 +619,11 @@
                     <member>any</member>
                   </hip-profiles>
                   <action>allow</action>
+                  <profile-setting>
+                    <group>
+                      <member>Outbound-SGP</member>
+                    </group>
+                  </profile-setting>
                 </entry>
               </rules>
             </security>
@@ -660,48 +643,6 @@
             </default-security-rules>
             <nat>
               <rules>
-                <entry name="Health Probes">
-                  <to>
-                    <member>Untrust</member>
-                  </to>
-                  <from>
-                    <member>Untrust</member>
-                  </from>
-                  <source>
-                    <member>168.63.129.16</member>
-                  </source>
-                  <destination>
-                    <member>10.0.1.5</member>
-                  </destination>
-                  <service>any</service>
-                  <to-interface>any</to-interface>
-                </entry>
-                <entry name="Inbound-80-FW1">
-                  <source-translation>
-                    <dynamic-ip-and-port>
-                      <interface-address>
-                        <interface>ethernet1/2</interface>
-                      </interface-address>
-                    </dynamic-ip-and-port>
-                  </source-translation>
-                  <to>
-                    <member>Untrust</member>
-                  </to>
-                  <from>
-                    <member>Untrust</member>
-                  </from>
-                  <source>
-                    <member>any</member>
-                  </source>
-                  <destination>
-                    <member>10.0.1.5</member>
-                  </destination>
-                  <destination-translation>
-                    <translated-address>10.0.4.100</translated-address>
-                  </destination-translation>
-                  <service>any</service>
-                  <to-interface>any</to-interface>
-                </entry>
                 <entry name="Outbound Hide">
                   <source-translation>
                     <dynamic-ip-and-port>
@@ -741,6 +682,28 @@
               <allow-forward-decrypted-content>yes</allow-forward-decrypted-content>
             </ssl-decrypt>
           </setting>
+          <profile-group>
+            <entry name="Outbound-SGP">
+              <virus>
+                <member>default</member>
+              </virus>
+              <spyware>
+                <member>default</member>
+              </spyware>
+              <vulnerability>
+                <member>default</member>
+              </vulnerability>
+              <url-filtering>
+                <member>default</member>
+              </url-filtering>
+              <file-blocking>
+                <member>basic file blocking</member>
+              </file-blocking>
+              <wildfire-analysis>
+                <member>default</member>
+              </wildfire-analysis>
+            </entry>
+          </profile-group>
         </entry>
       </vsys>
     </entry>
