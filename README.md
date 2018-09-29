@@ -17,3 +17,7 @@ It includes following components:
  - Bootstraping
  - BYOL or PAYG Licensing
  and creates all the infrastructure and appropriate UDRs.
+ 
+ If bootstraping with default configuration file is used default credentials are:
+ - Username: paloalto
+ - Password: PaloAlt0!123!!
