@@ -115,7 +115,7 @@
           },
           "protectedSubnetAddressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.4.0/24",
+            "defaultValue": "10.0.3.0/24",
             "metadata": {
               "description": "Protected Subnet address CIDR"
             }
@@ -184,18 +184,19 @@
                     },
     "variables": {
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "customDataField": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('StorageAccountFileShareDirectory'))]"
+        "customDataField": "[concat('storage-account=', parameters('BootstrapStorageAccount'), ',access-key=', parameters('StorageAccountAccessKey'), ',file-share=', parameters('StorageAccountFileShare'),',share-directory=', parameters('StorageAccountFileShareDirectory'))]",
+        "rtProtectedSubnetName": "[concat('RT-',parameters('protectedSubnetName'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/routeTables",
-            "name": "RT-Dev",
+            "name": "[variables('rtProtectedSubnetName')]",
             "apiVersion": "2016-03-30",
             "location": "[resourceGroup().location]",
             "properties": {
                 "routes": [
                     {
-                        "name": "Dev-Network",
+                        "name": "[concat(parameters('protectedSubnetName'),'-Network')]",
                         "properties": {
                             "addressPrefix": "[parameters('virtualNetworkAddressPrefix')]",
                             "nextHopType": "VirtualAppliance",
@@ -203,14 +204,14 @@
                         }
                     },
                     {
-                        "name": "Dev-Local",
+                        "name": "[concat(parameters('protectedSubnetName'),'-Local')]",
                         "properties": {
                             "addressPrefix": "[parameters('protectedSubnetAddressPrefix')]",
                             "nextHopType": "VnetLocal"
                         }
                     },
                     {
-                        "name": "Dev-Default",
+                        "name": "[concat(parameters('protectedSubnetName'),'-Default')]",
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
@@ -218,9 +219,9 @@
                         }
                     },
                     {
-                        "name": "Dev-Trust",
+                        "name": "[concat(parameters('protectedSubnetName'),'-Trust')]",
                         "properties": {
-                            "addressPrefix": "10.0.2.0/24",
+                            "addressPrefix": "[parameters('trustSubnetAddressPrefix')]",
                             "nextHopType": "VnetLocal"
                         }
                     }
@@ -270,20 +271,11 @@
                         }
                     },
                     {
-                        "name": "Egress",
+                        "name": "[parameters('protectedSubnetName')]",
                         "properties": {
-                            "addressPrefix": "10.0.3.0/24",
-				"networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Allow-All')]"
-                            }
-                         }
-                    },
-                    {
-                        "name": "Dev",
-                        "properties": {
-                            "addressPrefix": "10.0.4.0/24",
+                            "addressPrefix": "[parameters('protectedSubnetAddressPrefix')]",
                             "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables', 'RT-Dev')]"
+                                "id": "[resourceId('Microsoft.Network/routeTables', variables('rtProtectedSubnetName'))]"
                             },
 				"networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
@@ -293,7 +285,7 @@
                 ]
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/routeTables', 'RT-Dev')]",
+                "[resourceId('Microsoft.Network/routeTables', variables('rtProtectedSubnetName'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'Allow-All')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
             ]
@@ -647,14 +639,13 @@
                     {
                         "name": "Dev",
                         "properties": {
-                            "privateIPAllocationMethod": "Static",
+                            "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-Dev-Management')]"
                             },
                             "subnet": {
-                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/Dev')]"
-                            },
-                            "privateIpAddress": "10.0.4.50"
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/',parameters('protectedSubnetName'))]"
+                            }
                         }
                     }
                 ]
@@ -1063,6 +1054,142 @@
                     "adminUsername": "[parameters('Username')]",
                     "adminPassword": "[parameters('Password')]",
                      "customData": "[base64(variables('customDataField'))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "vmseries1",
+                        "sku": "[parameters('imageSku')]",
+                        "version": "[parameters('imageVersion')]"
+                    },
+                    "osDisk": {
+                        "managedDisk": { "storageAccountType": "Premium_LRS" },
+			"caching": "ReadWrite",
+            		"createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Management')]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Untrust')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Trust')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW2-Management')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Management')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Untrust')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW2-Trust')]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'AS-FW')]"
+            ]
+        },
+        {
+            "apiVersion": "2016-04-30-preview",
+            "condition": "[equals(parameters('bootstrapFirewall'),'no')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "VM-FW01",
+            "location": "[resourceGroup().location]",
+            "plan": {
+                "name": "[parameters('imageSku')]",
+                "product": "vmseries1",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'AS-FW')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "VM-FW1",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "vmseries1",
+                        "sku": "[parameters('imageSku')]",
+                        "version": "[parameters('imageVersion')]"
+                    },
+                    "osDisk": {
+                        "managedDisk": { "storageAccountType": "Premium_LRS" },
+			"caching": "ReadWrite",
+            		"createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Management')]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Untrust')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Trust')]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', 'IP-FW1-Management')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Management')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Untrust')]",
+                "[resourceId('Microsoft.Network/networkInterfaces', 'INT-FW1-Trust')]",
+                "[resourceId('Microsoft.Compute/availabilitySets', 'AS-FW')]"
+            ]
+        },
+        {
+            "apiVersion": "2016-04-30-preview",
+            "condition": "[equals(parameters('bootstrapFirewall'),'no')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "VM-FW02",
+            "location": "[resourceGroup().location]",
+            "plan": {
+                "name": "[parameters('imageSku')]",
+                "product": "vmseries1",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'AS-FW')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "VM-FW2",
+                    "adminUsername": "[parameters('Username')]",
+                    "adminPassword": "[parameters('Password')]"
                 },
                 "storageProfile": {
                     "imageReference": {
