@@ -1,4 +1,4 @@
-#Palo Alto Networks LB Sandwitch for Azure Egress Security
+# Palo Alto Networks LB Sandwitch for Azure Egress Security
 
 [<img src="http://azuredeploy.net/deploybutton.png"/>](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdstanic-pan%2Fazure-egress%2Fmaster%2FazureDeploy.json)
 
@@ -11,7 +11,7 @@ It includes following components:
 - Multiple Subnets and UDRs to support the traffic flow
 
  The template allows selection of:
- New or Existing VNET
- Bootstraping
- BYOL or PAYG Licensing
+ - New or Existing VNET
+ - Bootstraping
+ - BYOL or PAYG Licensing
  and creates all the infrastructure and appropriate UDRs.
