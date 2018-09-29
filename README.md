@@ -11,7 +11,7 @@ It includes following components:
 - Multiple Subnets and UDRs to support the traffic flow
 
  The template allows selection of:
- New or Existing VNET
- Bootstraping
- BYOL or PAYG Licensing
+ - New or Existing VNET
+ - Bootstraping
+ - BYOL or PAYG Licensing
  and creates all the infrastructure and appropriate UDRs.
