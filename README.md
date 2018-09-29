@@ -19,5 +19,5 @@ It includes following components:
  and creates all the infrastructure and appropriate UDRs.
  
  If bootstraping with default configuration file is used default credentials are:
- Username: paloalto
- Password: PaloAlt0!123!!
+ - Username: paloalto
+ - Password: PaloAlt0!123!!
