@@ -291,6 +291,22 @@
             ]
         },
         {
+        "apiVersion": "2016-06-01",
+        "condition": "[equals(parameters('vnetNewOrExisting'),'existing')]",
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "name": "[concat(parameters('virtualNetworkName'), '/', parameters('protectedSubnetName'))]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "addressPrefix": "[parameters('protectedSubnetAddressPrefix')]",
+          "routeTable": {
+            "id": "[resourceId('Microsoft.Network/routeTables', variables('rtProtectedSubnetName'))]"
+          },
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
+                 }
+            }
+      },
+        {
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "IP-FW1-Management",
             "apiVersion": "2017-08-01",
