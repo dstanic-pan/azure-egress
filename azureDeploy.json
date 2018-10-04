@@ -304,7 +304,12 @@
           "networkSecurityGroup": {
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
                  }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/routeTables', variables('rtProtectedSubnetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'Allow-All')]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', 'Management')]"
+            ]
       },
         {
             "type": "Microsoft.Network/publicIPAddresses",
